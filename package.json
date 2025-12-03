@@ -6,6 +6,10 @@
   "bin": {
     "codemap": "bin/codemap.js"
   },
+  "files": [
+    "bin/",
+    "src/"
+  ],
   "scripts": {
     "test": "node --test"
   },
