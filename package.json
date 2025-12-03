@@ -1,0 +1,17 @@
+{
+  "name": "codemap-cli",
+  "version": "1.0.0",
+  "description": "Convert code repos into a single LLM-friendly text snapshot",
+  "main": "bin/codemap.js",
+  "bin": {
+    "codemap": "bin/codemap.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "author": "midhey",
+  "license": "MIT",
+  "dependencies": {
+    "ignore": "^7.0.5"
+  }
+}
