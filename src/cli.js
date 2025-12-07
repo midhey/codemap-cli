@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const { parseArgs, printHelp } = require("./args");
-const { loadIgnore } = require("./ignore");
 const { walk } = require("./walk");
 const { readTextFileOrNull, extToLang } = require("./fileUtils");
 const { formatSnapshot } = require("./formatter");
@@ -16,13 +15,19 @@ function run() {
 
   const root = path.resolve(process.cwd(), args.target);
 
+  let outPathAbs = null;
+  if (args.output !== "-") {
+    outPathAbs = path.resolve(process.cwd(), args.output);
+  }
+
   if (!fs.existsSync(root) || !fs.statSync(root).isDirectory()) {
     console.error(`codemap: path is not a directory: ${root}`);
     process.exit(1);
   }
 
-  const ig = loadIgnore(root);
-  const fileEntries = walk(root, ig).sort((a, b) =>
+  console.log(`codemap: scanning ${root}...`);
+
+  const fileEntries = walk(root, outPathAbs).sort((a, b) =>
     a.relPath.localeCompare(b.relPath),
   );
 
@@ -38,12 +43,17 @@ function run() {
 
   const filesWithContent = fileEntries
     .map(({ relPath, absPath }) => {
-      const content = readTextFileOrNull(absPath);
-      if (content === null) {
+      try {
+        const content = readTextFileOrNull(absPath);
+        if (content === null) return null;
+        const lang = extToLang(relPath);
+        return { relPath, lang, content };
+      } catch (err) {
+        console.warn(
+          `codemap: skipping file ${relPath} due to error: ${err.message}`,
+        );
         return null;
       }
-      const lang = extToLang(relPath);
-      return { relPath, lang, content };
     })
     .filter(Boolean);
 
@@ -53,14 +63,18 @@ function run() {
     preambleText,
   });
 
+  const totalChars = outputText.length;
+  const estTokens = Math.ceil(totalChars / 4);
+
   if (args.output === "-") {
     process.stdout.write(outputText);
   } else {
-    const outPath = path.resolve(process.cwd(), args.output);
-    fs.writeFileSync(outPath, outputText, "utf8");
-    console.error(
-      `codemap: wrote ${filesWithContent.length} text files to ${outPath}`,
-    );
+    fs.writeFileSync(outPathAbs, outputText, "utf8");
+    console.log(`codemap: success!`);
+    console.log(`  Files:  ${filesWithContent.length}`);
+    console.log(`  Size:   ${(totalChars / 1024).toFixed(1)} KB`);
+    console.log(`  Tokens: ~${estTokens.toLocaleString()} (estimate)`);
+    console.log(`  Output: ${outPathAbs}`);
   }
 }
 
