@@ -39,3 +39,40 @@ test("walk respects nested .gitignore", () => {
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
+
+test("walk respects nested negation rules (!pattern) from child .gitignore", () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "codemap-negation-"));
+
+  fs.writeFileSync(path.join(tmpDir, ".gitignore"), "subdir/*\n", "utf8");
+  fs.mkdirSync(path.join(tmpDir, "subdir"));
+  fs.writeFileSync(path.join(tmpDir, "subdir", ".gitignore"), "!keep.js\n", "utf8");
+  fs.writeFileSync(path.join(tmpDir, "subdir", "keep.js"), "ok", "utf8");
+  fs.writeFileSync(path.join(tmpDir, "subdir", "drop.js"), "no", "utf8");
+
+  const files = walk(tmpDir, null);
+  const relPaths = files.map((f) => f.relPath).sort();
+
+  assert.deepEqual(relPaths, ["subdir/keep.js"]);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test("walk handles deep directory trees without recursive overflow", () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "codemap-deep-"));
+
+  let current = tmpDir;
+  const depth = 220;
+  for (let i = 0; i < depth; i++) {
+    current = path.join(current, "d");
+    fs.mkdirSync(current);
+  }
+  fs.writeFileSync(path.join(current, "leaf.js"), "console.log('leaf')\n", "utf8");
+
+  const files = walk(tmpDir, null);
+  const relPaths = files.map((f) => f.relPath);
+
+  assert.equal(relPaths.length, 1);
+  assert.ok(relPaths[0].endsWith("/leaf.js"));
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});

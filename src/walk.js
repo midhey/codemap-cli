@@ -37,7 +37,31 @@ function walk(root, outputFileAbs, options = {}) {
 
   const initialStack = [{ dir: root, ig: baseIg }];
 
-  function walkDir(currentAbsDir, ignoreStack) {
+  function shouldIgnore(absPath, isDirectory, ignoreStack) {
+    let ignored = false;
+
+    for (const { dir, ig } of ignoreStack) {
+      let relPath = path.relative(dir, absPath);
+      relPath = relPath.split(path.sep).join("/");
+      if (isDirectory && !relPath.endsWith("/")) {
+        relPath += "/";
+      }
+
+      const result = ig.test(relPath);
+      if (result.ignored) {
+        ignored = true;
+      } else if (result.unignored) {
+        ignored = false;
+      }
+    }
+
+    return ignored;
+  }
+
+  const dirStack = [{ dir: root, ignoreStack: initialStack }];
+  while (dirStack.length > 0) {
+    const { dir: currentAbsDir, ignoreStack } = dirStack.pop();
+
     let entries;
     try {
       entries = fs.readdirSync(currentAbsDir, { withFileTypes: true });
@@ -45,7 +69,7 @@ function walk(root, outputFileAbs, options = {}) {
       console.warn(
         `codemap: warning reading dir ${currentAbsDir}: ${e.message}`,
       );
-      return;
+      continue;
     }
 
     // 1. Проверяем, есть ли новые правила игнорирования в текущей папке
@@ -68,35 +92,22 @@ function walk(root, outputFileAbs, options = {}) {
         continue;
       }
 
+      const isDirectory = entry.isDirectory();
+      const isFile = entry.isFile();
+
       // --- Проверка 2.5: Секреты по denylist ---
-      if (entry.isFile() && !allowSecrets && isSecretPath(absPath, secretDenylist)) {
+      if (isFile && !allowSecrets && isSecretPath(absPath, secretDenylist)) {
         continue;
       }
 
       // --- Проверка 3: Проход по стеку игноров ---
-      // Файл должен пройти проверку ВСЕХ уровней в стеке.
-      // Если какой-то уровень говорит "ignore", значит пропускаем.
-      let isIgnored = false;
-      for (const { dir, ig } of nextStack) {
-        let relPath = path.relative(dir, absPath);
-        relPath = relPath.split(path.sep).join("/");
-
-        if (entry.isDirectory() && !relPath.endsWith("/")) {
-          relPath += "/";
-        }
-
-        if (ig.ignores(relPath)) {
-          isIgnored = true;
-          break;
-        }
+      if (shouldIgnore(absPath, isDirectory, nextStack)) {
+        continue;
       }
 
-      if (isIgnored) continue;
-
-      // --- Рекурсия или добавление ---
-      if (entry.isDirectory()) {
-        walkDir(absPath, nextStack);
-      } else if (entry.isFile()) {
+      if (isDirectory) {
+        dirStack.push({ dir: absPath, ignoreStack: nextStack });
+      } else if (isFile) {
         // Для результата нам нужен путь относительно корня запуска
         const relFromRoot = path
           .relative(root, absPath)
@@ -107,7 +118,6 @@ function walk(root, outputFileAbs, options = {}) {
     }
   }
 
-  walkDir(root, initialStack);
   return files;
 }
 
