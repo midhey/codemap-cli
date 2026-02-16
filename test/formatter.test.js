@@ -22,3 +22,21 @@ test("formatSnapshot: includes header, preamble and file blocks", () => {
   assert.ok(output.includes('console.log("hello");'));
   assert.ok(output.includes("```"));
 });
+
+test("formatSnapshot: uses safe fence when content contains backticks", () => {
+  const root = "/path/to/repo";
+  const files = [
+    {
+      relPath: "src/snippet.md",
+      lang: "md",
+      content: "before\n```\ninside\n````\nafter\n",
+    },
+  ];
+
+  const output = formatSnapshot({ root, files, preambleText: null });
+
+  assert.ok(output.includes("# file: src/snippet.md"));
+  assert.ok(output.includes("`````md\n"));
+  assert.ok(output.includes("\n`````\n\n"));
+  assert.ok(output.includes("````\n"));
+});
