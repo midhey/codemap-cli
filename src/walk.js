@@ -1,14 +1,22 @@
 const fs = require("fs");
 const path = require("path");
 const { loadIgnoreForDir } = require("./ignore");
+const { buildSecretDenylist, isSecretPath } = require("./secrets");
 
 /**
  * Рекурсивный обход дерева с поддержкой вложенных ignore-файлов.
  * @param {string} root - Абсолютный путь к корню сканирования
  * @param {string|null} outputFileAbs - Абсолютный путь к файлу вывода (чтобы исключить его)
+ * @param {object} [options]
+ * @param {boolean} [options.allowSecrets=false]
+ * @param {object} [options.secretDenylist]
+ * @param {string[]} [options.secretDenylist.basenames]
+ * @param {string[]} [options.secretDenylist.extensions]
  */
-function walk(root, outputFileAbs) {
+function walk(root, outputFileAbs, options = {}) {
   const files = [];
+  const allowSecrets = options.allowSecrets === true;
+  const secretDenylist = buildSecretDenylist(options.secretDenylist);
   const ALWAYS_IGNORED_NAMES = new Set([
     ".git",
     ".hg",
@@ -57,6 +65,11 @@ function walk(root, outputFileAbs) {
 
       // --- Проверка 2: Системные папки/файлы (быстрая проверка) ---
       if (ALWAYS_IGNORED_NAMES.has(name)) {
+        continue;
+      }
+
+      // --- Проверка 2.5: Секреты по denylist ---
+      if (entry.isFile() && !allowSecrets && isSecretPath(absPath, secretDenylist)) {
         continue;
       }
 

@@ -27,7 +27,9 @@ function run() {
 
   console.log(`codemap: scanning ${root}...`);
 
-  const fileEntries = walk(root, outPathAbs).sort((a, b) =>
+  const fileEntries = walk(root, outPathAbs, {
+    allowSecrets: args.allowSecrets,
+  }).sort((a, b) =>
     a.relPath.localeCompare(b.relPath),
   );
 

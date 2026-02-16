@@ -7,6 +7,7 @@ test("parseArgs: default values when no args", () => {
   assert.equal(res.target, ".");
   assert.equal(res.output, "output.txt");
   assert.equal(res.preamble, null);
+  assert.equal(res.allowSecrets, false);
   assert.equal(res.showHelp, false);
 });
 
@@ -25,4 +26,9 @@ test("parseArgs: -o and -p options", () => {
 test("parseArgs: --help flag", () => {
   const res = parseArgs(["--help"]);
   assert.equal(res.showHelp, true);
+});
+
+test("parseArgs: --allow-secrets enables secrets inclusion", () => {
+  const res = parseArgs([".", "--allow-secrets"]);
+  assert.equal(res.allowSecrets, true);
 });

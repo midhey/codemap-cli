@@ -3,12 +3,13 @@ function printHelp() {
     codemap - snapshot repo into a single text file.
 
     Usage:
-      codemap [path] [-o output.txt] [-p preamble.txt]
+      codemap [path] [-o output.txt] [-p preamble.txt] [--allow-secrets]
 
     Options:
       path             Путь к каталогу (по умолчанию .)
       -o, --output     Файл вывода (по умолчанию output.txt, "-" = stdout)
       -p, --preamble   Файл-преамбула, содержимое вставляется в начало
+      --allow-secrets  Отключить встроенный denylist секретов (.env, id_rsa, *.pem и др.)
       -h, --help       Показать эту справку
   `);
 }
@@ -17,6 +18,7 @@ function parseArgs(argv) {
   let target = ".";
   let output = "output.txt";
   let preamble = null;
+  let allowSecrets = false;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -30,13 +32,15 @@ function parseArgs(argv) {
       output = argv[++i];
     } else if (arg === "-p" || arg === "--preamble") {
       preamble = argv[++i];
+    } else if (arg === "--allow-secrets") {
+      allowSecrets = true;
     } else if (arg === "-h" || arg === "--help") {
       printHelp();
       return { showHelp: true };
     }
   }
 
-  return { target, output, preamble, showHelp: false };
+  return { target, output, preamble, allowSecrets, showHelp: false };
 }
 
 module.exports = {
