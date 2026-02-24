@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/midhey/codemap-cli/compare/v1.1.0...v1.2.0) (2026-02-24)
+
+
+### Features
+
+* **security:** add default secret denylist with opt-out flag ([c116ef3](https://github.com/midhey/codemap-cli/commit/c116ef31b90e79b25a0c0ce31b77f3965f650e7c))
+
+
+### Bug Fixes
+
+* **formatter:** generate safe markdown fences for file content ([f8d9f0b](https://github.com/midhey/codemap-cli/commit/f8d9f0beb5cca10bd86d6ed8d930cea57019b45f))
+* **walk:** support nested ignore negation and iterative traversal ([410b096](https://github.com/midhey/codemap-cli/commit/410b0960a41c967a01b7f39088e706ad56a1a7fd))
+
 ## [1.1.0](https://github.com/midhey/codemap-cli/compare/v1.0.0...v1.1.0) (2025-12-07)
 
 
