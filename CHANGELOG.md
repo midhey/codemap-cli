@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/midhey/codemap-cli/compare/v1.2.0...v1.2.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* print --help output once ([e263591](https://github.com/midhey/codemap-cli/commit/e263591a39495e95ea0f94b0dae2ce445fb7a987))
+* print --help output once ([bb90153](https://github.com/midhey/codemap-cli/commit/bb9015369b8ad9b0e92e359966cf874e10aac676))
+
 ## [1.2.0](https://github.com/midhey/codemap-cli/compare/v1.1.0...v1.2.0) (2026-02-24)
 
 
