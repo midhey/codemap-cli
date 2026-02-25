@@ -28,6 +28,22 @@ test("parseArgs: --help flag", () => {
   assert.equal(res.showHelp, true);
 });
 
+test("parseArgs: --help does not print output", () => {
+  const originalLog = console.log;
+  let calls = 0;
+  console.log = () => {
+    calls += 1;
+  };
+
+  try {
+    parseArgs(["--help"]);
+  } finally {
+    console.log = originalLog;
+  }
+
+  assert.equal(calls, 0);
+});
+
 test("parseArgs: --allow-secrets enables secrets inclusion", () => {
   const res = parseArgs([".", "--allow-secrets"]);
   assert.equal(res.allowSecrets, true);

@@ -35,7 +35,6 @@ function parseArgs(argv) {
     } else if (arg === "--allow-secrets") {
       allowSecrets = true;
     } else if (arg === "-h" || arg === "--help") {
-      printHelp();
       return { showHelp: true };
     }
   }
