@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/midhey/codemap-cli/compare/v1.2.1...v1.3.0) (2026-04-01)
+
+
+### Features
+
+* **cli:** add version flag ([036cf8b](https://github.com/midhey/codemap-cli/commit/036cf8b3281941ed83253c73038f3cacc6595866))
+
 ## [1.2.1](https://github.com/midhey/codemap-cli/compare/v1.2.0...v1.2.1) (2026-02-25)
 
 
