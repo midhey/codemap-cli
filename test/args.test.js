@@ -9,6 +9,7 @@ test("parseArgs: default values when no args", () => {
   assert.equal(res.preamble, null);
   assert.equal(res.allowSecrets, false);
   assert.equal(res.showHelp, false);
+  assert.equal(res.showVersion, false);
 });
 
 test("parseArgs: positional path sets target", () => {
@@ -47,4 +48,14 @@ test("parseArgs: --help does not print output", () => {
 test("parseArgs: --allow-secrets enables secrets inclusion", () => {
   const res = parseArgs([".", "--allow-secrets"]);
   assert.equal(res.allowSecrets, true);
+});
+
+test("parseArgs: --version flag", () => {
+  const res = parseArgs(["--version"]);
+  assert.equal(res.showVersion, true);
+});
+
+test("parseArgs: -v flag", () => {
+  const res = parseArgs(["-v"]);
+  assert.equal(res.showVersion, true);
 });

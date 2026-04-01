@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const packageJson = require("../package.json");
 const { parseArgs, printHelp } = require("./args");
 const { walk } = require("./walk");
 const { readTextFileOrNull, extToLang } = require("./fileUtils");
@@ -10,6 +11,11 @@ function run() {
 
   if (args.showHelp) {
     printHelp();
+    return;
+  }
+
+  if (args.showVersion) {
+    console.log(packageJson.version);
     return;
   }
 
