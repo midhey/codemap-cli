@@ -2,6 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const path = require("path");
 const { spawnSync } = require("node:child_process");
+const packageJson = require("../package.json");
 
 test("cli: --help prints usage once", () => {
   const binPath = path.join(__dirname, "..", "bin", "codemap.js");
@@ -24,6 +25,6 @@ test("cli: --version prints version without scanning", () => {
 
   assert.equal(res.status, 0);
   assert.equal(res.stderr, "");
-  assert.equal(res.stdout.trim(), "1.2.1");
+  assert.equal(res.stdout.trim(), packageJson.version);
   assert.equal(res.stdout.includes("scanning"), false);
 });
