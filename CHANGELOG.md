@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/midhey/codemap-cli/compare/v1.3.0...v1.3.1) (2026-04-01)
+
+
+### Bug Fixes
+
+* issue[#12](https://github.com/midhey/codemap-cli/issues/12) ([5c77c81](https://github.com/midhey/codemap-cli/commit/5c77c81d334e72f81a3ae1034ab021a9ad2bf862))
+
 ## [1.3.0](https://github.com/midhey/codemap-cli/compare/v1.2.1...v1.3.0) (2026-04-01)
 
 
