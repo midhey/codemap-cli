@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { parseArgs } = require("../src/args");
+const { ArgsError, parseArgs } = require("../src/args");
 
 test("parseArgs: default values when no args", () => {
   const res = parseArgs([]);
@@ -58,4 +58,37 @@ test("parseArgs: --version flag", () => {
 test("parseArgs: -v flag", () => {
   const res = parseArgs(["-v"]);
   assert.equal(res.showVersion, true);
+});
+
+test("parseArgs: missing value for -o throws ArgsError", () => {
+  assert.throws(
+    () => parseArgs([".", "-o"]),
+    (error) => {
+      assert.ok(error instanceof ArgsError);
+      assert.equal(error.message, "missing value for -o");
+      return true;
+    },
+  );
+});
+
+test("parseArgs: missing value for --preamble when next token is a flag", () => {
+  assert.throws(
+    () => parseArgs([".", "--preamble", "--version"]),
+    (error) => {
+      assert.ok(error instanceof ArgsError);
+      assert.equal(error.message, "missing value for --preamble");
+      return true;
+    },
+  );
+});
+
+test("parseArgs: unknown flags are rejected", () => {
+  assert.throws(
+    () => parseArgs(["--unknown-flag"]),
+    (error) => {
+      assert.ok(error instanceof ArgsError);
+      assert.equal(error.message, "unknown option: --unknown-flag");
+      return true;
+    },
+  );
 });

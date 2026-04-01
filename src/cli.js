@@ -1,13 +1,24 @@
 const fs = require("fs");
 const path = require("path");
 const packageJson = require("../package.json");
-const { parseArgs, printHelp } = require("./args");
+const { ArgsError, parseArgs, printHelp } = require("./args");
 const { walk } = require("./walk");
 const { readTextFileOrNull, extToLang } = require("./fileUtils");
 const { formatSnapshot } = require("./formatter");
 
 function run() {
-  const args = parseArgs(process.argv.slice(2));
+  let args;
+  try {
+    args = parseArgs(process.argv.slice(2));
+  } catch (error) {
+    if (error instanceof ArgsError) {
+      console.error(`codemap: ${error.message}`);
+      printHelp();
+      process.exit(1);
+    }
+
+    throw error;
+  }
 
   if (args.showHelp) {
     printHelp();

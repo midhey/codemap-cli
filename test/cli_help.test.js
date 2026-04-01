@@ -28,3 +28,25 @@ test("cli: --version prints version without scanning", () => {
   assert.equal(res.stdout.trim(), packageJson.version);
   assert.equal(res.stdout.includes("scanning"), false);
 });
+
+test("cli: missing value for -o exits with code 1 and prints help", () => {
+  const binPath = path.join(__dirname, "..", "bin", "codemap.js");
+  const res = spawnSync(process.execPath, [binPath, ".", "-o"], {
+    encoding: "utf8",
+  });
+
+  assert.equal(res.status, 1);
+  assert.match(res.stderr, /codemap: missing value for -o/);
+  assert.match(res.stdout, /Usage:/);
+});
+
+test("cli: unknown flags exit with code 1 and prints help", () => {
+  const binPath = path.join(__dirname, "..", "bin", "codemap.js");
+  const res = spawnSync(process.execPath, [binPath, "--unknown-flag"], {
+    encoding: "utf8",
+  });
+
+  assert.equal(res.status, 1);
+  assert.match(res.stderr, /codemap: unknown option: --unknown-flag/);
+  assert.match(res.stdout, /Usage:/);
+});
